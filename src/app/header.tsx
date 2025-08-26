@@ -92,10 +92,7 @@ export default function Header() {
           </div>
         ))}
 
-        {/* Optional: toggle inside the mobile dropdown too */}
-        <div style={{ marginTop: "0.5rem" }}>
-          <ThemeToggle />
-        </div>
+       
       </nav>
 
       <style jsx>{`

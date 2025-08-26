@@ -1,5 +1,5 @@
 import "./globals.css";
-import Header from "./header"; // import client header
+import Header from "./header";
 import Footer from "./footer";
 
 export const metadata = {
@@ -14,11 +14,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body
+        style={{
+          margin: 0,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+        }}
+      >
         <Header />
-        <main>{children}</main>
+        {/* this grows to push footer down */}
+        <main style={{ flex: 1 }}>{children}</main>
         <Footer />
       </body>
     </html>
   );
 }
+

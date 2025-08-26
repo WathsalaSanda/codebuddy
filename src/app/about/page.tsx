@@ -1,7 +1,9 @@
 export default function AboutPage() {
   return (
     <main style={{ padding: "2rem" }}>
-      <h1>About This Project</h1>
+      
+      <h1>About This Project</h1><br></br>
+    
       <p><strong>Name:</strong> wathsala Sandamali Galle Arachchige</p>
       <p><strong>Student Number:</strong> 22106532 </p>
 

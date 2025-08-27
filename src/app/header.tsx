@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import ThemeToggle from "./components/themetoggle"; // 👈 ADD THIS
+import ThemeToggle from "./components/themetoggle"; 
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -56,7 +56,7 @@ export default function Header() {
           ))}
         </div>
 
-        {/* 👇 THEME TOGGLE BUTTONS */}
+        {/* THEME TOGGLE BUTTONS */}
         <ThemeToggle />
 
         {/* Hamburger (mobile) */}

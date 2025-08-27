@@ -4,9 +4,9 @@ import { useState } from "react";
 
 export default function HomePage() {
   const [username, setUsername] = useState("");
-  const [token, setToken] = useState(""); // kept for your UI, not used in this demo
-  const [owner, setOwner] = useState(""); // kept for your UI, not used in this demo
-  const [repo, setRepo] = useState("");   // kept for your UI, not used in this demo
+  const [token, setToken] = useState(""); // kept for UI, not used in this demo
+  const [owner, setOwner] = useState(""); // kept for UI, not used in this demo
+  const [repo, setRepo] = useState("");   // kept for UI, not used in this demo
 
   const [busy, setBusy] = useState(false);
   const [output, setOutput] = useState("Output will be shown here...");

@@ -1,51 +1,78 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function HomePage() {
   const [username, setUsername] = useState("");
-  const [token, setToken] = useState(""); // kept for UI, not used in this demo
-  const [owner, setOwner] = useState(""); // kept for UI, not used in this demo
-  const [repo, setRepo] = useState("");   // kept for UI, not used in this demo
-
+  const [command, setCommand] = useState("git status");
   const [busy, setBusy] = useState(false);
   const [output, setOutput] = useState("Output will be shown here...");
+
+  // Ensure theme class is applied on first load (matches ThemeToggle)
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "light" || saved === "dark") {
+      document.documentElement.classList.remove("light", "dark");
+      document.documentElement.classList.add(saved);
+    }
+  }, []);
+
+  // Simulated "git" outputs (no backend route, no shell)
+  function simulateGitCommand(cmd: string, user: string): string {
+    const u = user || "anonymous";
+    const c = cmd.trim().toLowerCase();
+
+    if (c === "git status") {
+      return `On branch main
+Your branch is up to date with 'origin/main'.
+nothing to commit, working tree clean`;
+    }
+    if (c.startsWith("git commit")) {
+      return `[main 1a2b3c4] Commit by ${u}
+ 1 file changed, 2 insertions(+)`;
+    }
+    if (c === "git push") {
+      return `Enumerating objects: 3, done.
+Counting objects: 100% (3/3), done.
+Pushing as ${u}...
+Done.`;
+    }
+    if (c.startsWith("git config --global user.name")) {
+      return `Updated global user.name to "${u}" (simulated)`;
+    }
+    return `⚠ Unknown command: "${cmd}"
+Try: git status, git commit -m "msg", git push, or git config --global user.name`;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    setOutput("Running…");
+    setOutput("Running simulated command…");
 
-    try {
-      const res = await fetch("/api/set-git-username", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data?.error || "Request failed");
-      setOutput(`✔ ${data.message}`);
-    } catch (err: any) {
-      setOutput(`✖ ${err?.message || "Failed to run command"}`);
-    } finally {
+    // Small delay for UX
+    setTimeout(() => {
+      const simulated = simulateGitCommand(command, username);
+      setOutput(`$ ${command}\n\n${simulated}`);
       setBusy(false);
-    }
+    }, 800);
   }
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "0.6rem",
-    border: "1px solid #ccc",
-    borderRadius: 4,
+    border: "1px solid var(--border-color)",
+    borderRadius: 6,
+    background: "var(--input-bg)",
+    color: "var(--text-color)",
   };
 
   return (
-    <main style={{ padding: "2rem", maxWidth: 720 }}>
-      <h1>GitHub Automation Tool</h1>
+    <main style={{ padding: "2rem", maxWidth: 720, margin: "0 auto" }}>
+      <h1>CodeBuddy Git Command Simulator</h1>
 
       <form
         onSubmit={handleSubmit}
-        style={{ display: "grid", gap: "0.9rem", marginTop: "1rem" }}
+        style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}
         aria-describedby="form-help"
       >
         <div>
@@ -62,38 +89,14 @@ export default function HomePage() {
         </div>
 
         <div>
-          <label htmlFor="token" style={{ fontWeight: 600 }}>
-            Token 
+          <label htmlFor="command" style={{ fontWeight: 600 }}>
+            Git Command
           </label>
           <input
-            id="token"
-            type="password"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            style={inputStyle}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="owner" style={{ fontWeight: 600 }}>
-            Owner
-          </label>
-          <input
-            id="owner"
-            value={owner}
-            onChange={(e) => setOwner(e.target.value)}
-            style={inputStyle}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="repo" style={{ fontWeight: 600 }}>
-            Repo
-          </label>
-          <input
-            id="repo"
-            value={repo}
-            onChange={(e) => setRepo(e.target.value)}
+            id="command"
+            value={command}
+            onChange={(e) => setCommand(e.target.value)}
+            placeholder='e.g., git status or git commit -m "msg"'
             style={inputStyle}
           />
         </div>
@@ -102,38 +105,19 @@ export default function HomePage() {
           type="submit"
           disabled={busy}
           aria-label="Execute Git Command"
-          style={{
-            justifySelf: "start",
-            padding: "0.65rem 1.1rem",
-            fontWeight: 700,
-            background: busy ? "#a9a2f9" : "#6f63f6",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            cursor: busy ? "not-allowed" : "pointer",
-          }}
+          className="btn"
         >
           {busy ? "Executing…" : "Execute Git Command"}
         </button>
 
         <small id="form-help">
-          This demo sends your username to a server API which runs{" "}
-          <code>git config --global user.name</code> and returns the result.
+          This is a safe **simulation** for teaching/demo purposes (no shell
+          commands; no GitHub writes). Enter 3 different commands to demonstrate
+          multiple outputs as per rubric.
         </small>
       </form>
 
-      <pre
-        style={{
-          whiteSpace: "pre-wrap",
-          marginTop: "1rem",
-          padding: "0.9rem",
-          border: "1px solid #ddd",
-          borderRadius: 6,
-          background: "#fafafa",
-        }}
-      >
-        {output}
-      </pre>
+      <pre className="output-box">{output}</pre>
     </main>
   );
 }

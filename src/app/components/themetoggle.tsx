@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 export default function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
 
-  // Load saved theme or fallback to system
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "light" || saved === "dark") {
@@ -22,6 +21,8 @@ export default function ThemeToggle() {
     const root = document.documentElement;
     root.classList.remove("light", "dark");
     root.classList.add(next);
+    // also set a data attribute if your CSS ever needs it
+    root.setAttribute("data-theme", next);
   }
 
   function toggle() {
@@ -39,8 +40,8 @@ export default function ThemeToggle() {
         width: "70px",
         height: "32px",
         borderRadius: "9999px",
-        border: "1px solid #aaa",
-        background: isDark ? "#1f2430" : "#f5f5f5",
+        border: "1px solid var(--border-color)",
+        background: isDark ? "var(--toggle-dark-bg)" : "var(--toggle-light-bg)",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
@@ -49,39 +50,21 @@ export default function ThemeToggle() {
         transition: "background 0.3s ease",
       }}
     >
-      {/* Track icons */}
-      <span
-        aria-hidden
-        style={{
-          position: "absolute",
-          left: "10px",
-          fontSize: "14px",
-          opacity: isDark ? 0.3 : 1,
-        }}
-      >
+      <span aria-hidden style={{ position: "absolute", left: "10px", fontSize: 14, opacity: isDark ? 0.35 : 1 }}>
         ☀
       </span>
-      <span
-        aria-hidden
-        style={{
-          position: "absolute",
-          right: "10px",
-          fontSize: "14px",
-          opacity: isDark ? 1 : 0.3,
-        }}
-      >
+      <span aria-hidden style={{ position: "absolute", right: "10px", fontSize: 14, opacity: isDark ? 1 : 0.35 }}>
         🌙
       </span>
 
-      {/* Thumb */}
       <span
         aria-hidden
         style={{
-          width: "24px",
-          height: "24px",
+          width: 24,
+          height: 24,
           borderRadius: "50%",
           background: isDark ? "#3a4050" : "#ffffff",
-          border: "1px solid #aaa",
+          border: "1px solid var(--border-color)",
           transition: "transform 0.3s ease, background 0.3s ease",
           transform: `translateX(${isDark ? "-2px" : "2px"})`,
         }}

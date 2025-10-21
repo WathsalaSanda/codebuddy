@@ -1,33 +1,38 @@
-# ---- Stage 1: Build ----
+# syntax=docker/dockerfile:1
+
+# ---------- Stage 1: Build ----------
 FROM node:20-bullseye-slim AS builder
+
 WORKDIR /app
 
-# Install build deps
-RUN apt-get update \
- && apt-get install -y --no-install-recommends python3 make g++ \
- && rm -rf /var/lib/apt/lists/*
-
-# Copy dependency files
+# Copy package files first
 COPY package*.json ./
-RUN npm ci
 
-# Copy the rest of the project
+# Install all dependencies including mysql2
+RUN npm install
+
+# Copy rest of the project
 COPY . .
 
-# Build Next.js (creates the .next folder inside container)
+# Build Next.js app
 RUN npm run build
 
-# ---- Stage 2: Runtime ----
-FROM node:20-bullseye-slim
+
+# ---------- Stage 2: Runtime ----------
+FROM node:20-bullseye-slim AS runner
+
 WORKDIR /app
 ENV NODE_ENV=production
 
+# Copy necessary files
 COPY --from=builder /app/package*.json ./
-RUN npm ci --omit=dev
-
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.* ./
+
+# Ensure mysql2 exists in runtime layer
+RUN npm install mysql2
 
 EXPOSE 3000
-CMD ["npm", "start"]
+
+CMD ["npm", "run", "start"]

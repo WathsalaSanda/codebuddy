@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // keep this empty or put your settings here
-  // If you previously added a webpack() override, paste it here (in JS form).
+  experimental: {
+    serverComponentsExternalPackages: ['mysql2', 'sequelize'],
+  },
+  webpack: (config) => {
+    // leave externals alone (no forced externals) — runtime will load mysql2
+    return config;
+  },
 };
 
 export default nextConfig;

@@ -1,8 +1,9 @@
 // src/lib/db/sequelize.ts
 import { Sequelize } from 'sequelize';
 
-// ⚠️ Use require here to avoid ESM/CJS default export pitfalls.
-const mysql2 = require('mysql2'); // <-- key change
+// IMPORTANT: grab the CommonJS export
+// (Sequelize expects what `require('mysql2')` returns)
+import * as mysql2 from 'mysql2';
 
 let db: Sequelize | null = null;
 
@@ -10,16 +11,14 @@ export default function getSequelize(): Sequelize {
   if (db) return db;
 
   const url = process.env.MYSQL_URL;
-  if (!url) throw new Error('MYSQL_URL is not set');
-
-  // prove we actually have the module we think we have
-  // (these logs will show once on server boot)
-  // eslint-disable-next-line no-console
-  console.log('[db] mysql2 typeof:', typeof mysql2);
+  if (!url) {
+    throw new Error('MYSQL_URL is not set');
+  }
 
   db = new Sequelize(url, {
     dialect: 'mysql',
-    dialectModule: mysql2,     // <-- explicitly provide the driver
+    // force Sequelize to use the driver we provide, no dynamic require:
+    dialectModule: mysql2,
     logging: false,
   });
 

@@ -1,0 +1,14 @@
+# Ignore everything
+**
+
+# Allow only required files
+!package.json
+!package-lock.json
+!next.config.*
+!tsconfig.json
+!postcss.config.*
+!tailwind.config.*
+
+# Source + static
+!src/**
+!public/**
